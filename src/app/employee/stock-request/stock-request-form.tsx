@@ -10,14 +10,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Plus, PlusCircle, Minus, Trash2 } from 'lucide-react';
 import type { Product } from '@/lib/types';
 
 const stockRequestSchema = z.object({
   shop_name: z.string().min(1, 'Shop name is required'),
   items: z.array(z.object({
     product_id: z.string().min(1, 'Product must be selected'),
-    quantity: z.coerce.number().int().positive('Quantity must be a positive number'),
+    quantity: z.coerce.number().int().positive('Boxes must be a positive number'),
   })).min(1, 'At least one item is required for a stock request.'),
 });
 
@@ -76,7 +76,16 @@ export function StockRequestForm({ products }: StockRequestFormProps) {
         <Label>Request Items</Label>
         {fields.map((field, index) => {
           const currentProductId = watch(`items.${index}.product_id`);
+          const currentQuantity = watch(`items.${index}.quantity`);
           const availableProducts = products.filter(p => !selectedProducts.includes(p.id) || p.id === currentProductId);
+
+          const handleQuantityChange = (delta: number) => {
+            const newValue = (currentQuantity || 0) + delta;
+            if (newValue >= 1) {
+              setValue(`items.${index}.quantity`, newValue, { shouldValidate: true });
+            }
+          };
+
           return (
             <div key={field.id} className="flex flex-col sm:flex-row items-start gap-4 p-4 border rounded-lg">
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
@@ -99,8 +108,21 @@ export function StockRequestForm({ products }: StockRequestFormProps) {
                       {errors.items?.[index]?.product_id && <p className="text-sm text-destructive">{errors.items[index].product_id.message}</p>}
                   </div>
                    <div className="space-y-2">
-                      <Label>Quantity</Label>
-                      <Input type="number" {...register(`items.${index}.quantity`)} min="1" />
+                      <Label>Boxes</Label>
+                       <div className="flex items-center gap-2">
+                          <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(-1)} disabled={currentQuantity <= 1}>
+                              <Minus className="h-4 w-4" />
+                          </Button>
+                          <Input 
+                              type="number"
+                              className="w-16 text-center"
+                              {...register(`items.${index}.quantity`)}
+                              min="1"
+                          />
+                          <Button type="button" variant="outline" size="icon" onClick={() => handleQuantityChange(1)}>
+                              <Plus className="h-4 w-4" />
+                          </Button>
+                      </div>
                       {errors.items?.[index]?.quantity && <p className="text-sm text-destructive">{errors.items[index].quantity.message}</p>}
                   </div>
               </div>
