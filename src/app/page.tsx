@@ -1,69 +1,62 @@
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, UserCog, User } from 'lucide-react';
-import { Logo } from '@/components/logo';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Check, Plus, Trash } from 'lucide-react'
 
-export default function Home() {
+export default function Page() {
+  const todos = [
+    { id: 1, text: 'Do the dishes', completed: false },
+    { id: 2, text: 'Walk the dog', completed: true },
+    { id: 3, text: 'Finish the project', completed: false },
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <header className="mb-12 text-center">
-        <div className="flex justify-center items-center gap-4 mb-4">
-          <Logo className="h-12 w-12" />
-          <h1 className="text-5xl font-headline font-bold text-primary">
-            RetailSync
-          </h1>
-        </div>
-        <p className="text-muted-foreground text-lg">
-          Streamline your retail operations with real-time data.
-        </p>
-      </header>
-
-      <main className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <UserCog className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-headline">Admin Dashboard</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-6">
-              Manage products, view reports, and oversee all store operations from one central hub.
-            </p>
-            <Button asChild className="w-full">
-              <Link href="/admin">
-                Go to Admin
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-              <User className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-headline">Employee Portal</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-6">
-              Access product lists, submit daily reports, and request new stock for your shop.
-            </p>
-            <Button asChild className="w-full">
-              <Link href="/employee">
-                Go to Employee
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </main>
-
-      <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} RetailSync. All rights reserved.</p>
-      </footer>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
+      <Card className="w-full max-w-lg shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-center text-gray-800 dark:text-gray-200">
+            Todo List
+          </CardTitle>
+          <CardDescription className="text-center text-gray-500 dark:text-gray-400">
+            A simple and attractive todo list application.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {todos.map(todo => (
+              <div
+                key={todo.id}
+                className={`flex items-center p-4 rounded-lg transition-all duration-300 ${
+                  todo.completed ? 'bg-green-100 dark:bg-green-900/50' : 'bg-white dark:bg-gray-800'
+                }`}
+              >
+                <div className="flex-1">
+                  <p className={`text-lg ${todo.completed ? 'line-through text-gray-500' : 'text-gray-800 dark:text-gray-200'}`}>
+                    {todo.text}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={`rounded-full ${todo.completed ? 'text-green-500' : 'text-gray-400 hover:text-green-500'}`}
+                  >
+                    <Check className="w-6 h-6" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="text-gray-400 hover:text-red-500 rounded-full">
+                    <Trash className="w-6 h-6" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between items-center p-6">
+          <Button variant="outline" className="w-full">
+            <Plus className="mr-2" />
+            Add New Todo
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
-  );
+  )
 }
