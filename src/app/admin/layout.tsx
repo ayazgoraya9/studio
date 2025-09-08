@@ -25,14 +25,17 @@ import { Button } from '@/components/ui/button';
 import { logout } from '../login/actions';
 
 function SignOutButton() {
-    return (
-        <form action={logout}>
-            <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-            </Button>
-        </form>
-    )
+  return (
+    <form action={logout}>
+      <Button
+        variant="ghost"
+        className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+      >
+        <LogOut className="mr-2 h-4 w-4" />
+        Sign Out
+      </Button>
+    </form>
+  );
 }
 
 export default function AdminLayout({
@@ -46,7 +49,9 @@ export default function AdminLayout({
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Logo className="w-8 h-8" />
-            <span className="text-lg font-semibold font-headline">RetailSync</span>
+            <span className="text-lg font-semibold font-headline">
+              RetailSync
+            </span>
           </div>
         </SidebarHeader>
         <SidebarContent>
@@ -92,7 +97,7 @@ export default function AdminLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-               <SidebarMenuButton asChild variant="outline" className="mt-4">
+              <SidebarMenuButton asChild variant="outline" className="mt-4">
                 <Link href="/">
                   <Home />
                   Back to Home
@@ -102,7 +107,7 @@ export default function AdminLayout({
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
-            <SignOutButton />
+          <SignOutButton />
         </SidebarFooter>
       </Sidebar>
       <div className="flex-1">
