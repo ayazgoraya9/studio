@@ -1,3 +1,4 @@
+
 import {
   SidebarProvider,
   Sidebar,
@@ -7,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import {
@@ -15,8 +17,23 @@ import {
   FileText,
   Warehouse,
   Home,
+  LogOut,
+  History,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
+import { Button } from '@/components/ui/button';
+import { logout } from '../login/actions';
+
+function SignOutButton() {
+    return (
+        <form action={logout}>
+            <Button variant="ghost" className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+            </Button>
+        </form>
+    )
+}
 
 export default function AdminLayout({
   children,
@@ -67,6 +84,14 @@ export default function AdminLayout({
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/admin/purchasing-history">
+                  <History />
+                  Purchasing History
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
                <SidebarMenuButton asChild variant="outline" className="mt-4">
                 <Link href="/">
                   <Home />
@@ -76,6 +101,9 @@ export default function AdminLayout({
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
+        <SidebarFooter>
+            <SignOutButton />
+        </SidebarFooter>
       </Sidebar>
       <div className="flex-1">
         <header className="p-4 border-b flex items-center gap-4">
