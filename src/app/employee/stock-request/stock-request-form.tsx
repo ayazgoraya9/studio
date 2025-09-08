@@ -1,0 +1,127 @@
+'use client';
+
+import { useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { submitStockRequest } from '@/lib/actions';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PlusCircle, Trash2 } from 'lucide-react';
+import type { Product } from '@/lib/types';
+
+const stockRequestSchema = z.object({
+  shop_name: z.string().min(1, 'Shop name is required'),
+  items: z.array(z.object({
+    product_id: z.string().min(1, 'Product must be selected'),
+    quantity: z.coerce.number().int().positive('Quantity must be a positive number'),
+  })).min(1, 'At least one item is required for a stock request.'),
+});
+
+type StockRequestFormValues = z.infer<typeof stockRequestSchema>;
+
+interface StockRequestFormProps {
+  products: Pick<Product, 'id' | 'name' | 'unit'>[];
+}
+
+export function StockRequestForm({ products }: StockRequestFormProps) {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { register, handleSubmit, control, formState: { errors }, reset, watch } = useForm<StockRequestFormValues>({
+    resolver: zodResolver(stockRequestSchema),
+    defaultValues: {
+      shop_name: '',
+      items: [{ product_id: '', quantity: 1 }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'items',
+  });
+
+  const onSubmit = async (data: StockRequestFormValues) => {
+    setIsSubmitting(true);
+    const result = await submitStockRequest(data);
+    setIsSubmitting(false);
+
+    if (result?.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: result.error,
+      });
+    } else {
+      toast({
+        title: 'Success',
+        description: 'Your stock request has been submitted.',
+      });
+      reset();
+    }
+  };
+
+  const selectedProducts = watch('items').map(item => item.product_id);
+  const availableProducts = products.filter(p => !selectedProducts.includes(p.id));
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="shop_name">Shop Name</Label>
+        <Input id="shop_name" {...register('shop_name')} />
+        {errors.shop_name && <p className="text-sm text-destructive">{errors.shop_name.message}</p>}
+      </div>
+
+      <div className="space-y-4">
+        <Label>Request Items</Label>
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex items-start gap-4 p-4 border rounded-lg">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>Product</Label>
+                    <Select
+                        onValueChange={(value) => control.setValue(`items.${index}.product_id`, value)}
+                        defaultValue={field.product_id}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a product" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {field.product_id && (
+                                <SelectItem value={field.product_id} disabled>
+                                    {products.find(p => p.id === field.product_id)?.name}
+                                </SelectItem>
+                            )}
+                            {availableProducts.map((p) => (
+                                <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {errors.items?.[index]?.product_id && <p className="text-sm text-destructive">{errors.items[index].product_id.message}</p>}
+                </div>
+                 <div className="space-y-2">
+                    <Label>Quantity</Label>
+                    <Input type="number" {...register(`items.${index}.quantity`)} min="1" />
+                    {errors.items?.[index]?.quantity && <p className="text-sm text-destructive">{errors.items[index].quantity.message}</p>}
+                </div>
+            </div>
+            <Button type="button" variant="destructive" size="icon" onClick={() => remove(index)} className="mt-8">
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+        {errors.items?.root && <p className="text-sm text-destructive">{errors.items.root.message}</p>}
+      </div>
+      
+      <Button type="button" variant="outline" onClick={() => append({ product_id: '', quantity: 1 })}>
+        <PlusCircle className="mr-2 h-4 w-4" /> Add Item
+      </Button>
+      
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? 'Submitting...' : 'Submit Stock Request'}
+      </Button>
+    </form>
+  );
+}
