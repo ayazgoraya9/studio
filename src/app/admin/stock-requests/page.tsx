@@ -1,6 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
 import { StockRequestsClient } from "./stock-requests-client";
 import type { FullStockRequest } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default async function StockRequestsPage() {
     const supabase = createClient();
@@ -30,5 +33,15 @@ export default async function StockRequestsPage() {
         return acc;
     }, {} as Record<string, FullStockRequest[]>);
 
-    return <StockRequestsClient requestsByShop={requestsByShop} />;
+    return (
+        <div className="space-y-4">
+            <Button variant="outline" asChild>
+                <Link href="/admin">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Dashboard
+                </Link>
+            </Button>
+            <StockRequestsClient requestsByShop={requestsByShop} />
+        </div>
+    );
 }
