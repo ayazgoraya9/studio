@@ -88,13 +88,13 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
     return (
         <Card>
             <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div className="flex-1">
                         <CardTitle className="text-2xl">{list.name}</CardTitle>
                         <CardDescription>Check off items as you buy them. Updates are synced in real-time.</CardDescription>
                     </div>
                     {list.total_cost ? (
-                        <Badge variant="secondary" className="text-lg">Total Cost: ${list.total_cost.toFixed(2)}</Badge>
+                        <Badge variant="secondary" className="text-lg whitespace-nowrap">Total Cost: ${list.total_cost.toFixed(2)}</Badge>
                     ) : (
                         <Button variant="outline" onClick={handleShare}><Share className="mr-2 h-4 w-4"/> Share List</Button>
                     )}
@@ -107,7 +107,7 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
                     {uncheckedItems.length > 0 ? uncheckedItems.map(item => (
                         <div key={item.id} className="flex items-center space-x-3 p-3 bg-background rounded-md border animate-in fade-in-20">
                             <Checkbox id={item.id} checked={!!item.is_checked} onCheckedChange={(checked) => handleCheckChange(item.id, !!checked)} />
-                            <Label htmlFor={item.id} className="text-base flex-1">
+                            <Label htmlFor={item.id} className="text-base flex-1 cursor-pointer">
                                 {item.product_name} - <span className="font-bold">{item.quantity} {item.product_unit}</span>
                             </Label>
                         </div>
@@ -122,7 +122,7 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
                         {checkedItems.map(item => (
                             <div key={item.id} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md border animate-in fade-in-20">
                                 <Checkbox id={item.id} checked={!!item.is_checked} onCheckedChange={(checked) => handleCheckChange(item.id, !!checked)} />
-                                <Label htmlFor={item.id} className="text-base flex-1 line-through text-muted-foreground">
+                                <Label htmlFor={item.id} className="text-base flex-1 line-through text-muted-foreground cursor-pointer">
                                     {item.product_name} - <span className="font-bold">{item.quantity} {item.product_unit}</span>
                                 </Label>
                             </div>
@@ -133,7 +133,7 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
             </CardContent>
             {!list.total_cost && (
                 <CardFooter>
-                    <form onSubmit={handleSavePurchase} className="w-full flex flex-col md:flex-row items-end gap-4 p-4 border rounded-lg bg-secondary/30">
+                    <form onSubmit={handleSavePurchase} className="w-full flex flex-col md:flex-row items-center md:items-end gap-4 p-4 border rounded-lg bg-secondary/30">
                         <div className="flex-1 w-full">
                             <Label htmlFor="total_cost" className="font-semibold">Enter Total Purchase Cost</Label>
                             <Input 
@@ -146,7 +146,7 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
                                 className="mt-1"
                             />
                         </div>
-                        <Button type="submit" disabled={isPending}>{isPending ? 'Saving...' : 'Save Purchase'}</Button>
+                        <Button type="submit" disabled={isPending} className="w-full md:w-auto">{isPending ? 'Saving...' : 'Save Purchase'}</Button>
                     </form>
                 </CardFooter>
             )}

@@ -10,18 +10,18 @@ export default function HomePage() {
       <header className="mb-12 text-center">
         <div className="flex justify-center items-center gap-4 mb-4">
             <Logo className="w-16 h-16" />
-            <h1 className="text-5xl font-bold font-headline text-primary">
+            <h1 className="text-5xl md:text-6xl font-bold font-headline text-primary">
                 RetailSync
             </h1>
         </div>
-        <p className="text-xl text-muted-foreground">
-          Streamlining Your Retail Operations
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+          Streamlining Your Retail Operations from Product Management to Daily Reporting.
         </p>
       </header>
       
       <div className="w-full max-w-4xl mx-auto">
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-xl active:scale-100 active:brightness-90">
+          <Card className="transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-2xl active:scale-100 active:brightness-90">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <Shield className="w-8 h-8 text-primary" />
@@ -40,7 +40,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-xl active:scale-100 active:brightness-90">
+          <Card className="transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-2xl active:scale-100 active:brightness-90">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <User className="w-8 h-8 text-primary" />

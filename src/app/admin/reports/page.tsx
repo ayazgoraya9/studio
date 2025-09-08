@@ -27,7 +27,7 @@ export default async function AdminReportsPage() {
           <CardTitle>Employee Daily Reports</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-md">
+          <div className="border rounded-md overflow-x-auto">
               <Table>
                   <TableHeader>
                       <TableRow>
@@ -47,12 +47,12 @@ export default async function AdminReportsPage() {
                       )}
                       {reports.map((report) => (
                           <TableRow key={report.id}>
-                              <TableCell>{format(parseISO(report.created_at!), 'PPP')}</TableCell>
-                              <TableCell className="font-medium">{report.shop_name}</TableCell>
-                              <TableCell>{report.salesman_name}</TableCell>
-                              <TableCell className="text-right">${report.total_sales.toFixed(2)}</TableCell>
-                              <TableCell className="text-right">${report.total_expenses.toFixed(2)}</TableCell>
-                              <TableCell className="text-right font-bold">${(report.total_sales - report.total_expenses).toFixed(2)}</TableCell>
+                              <TableCell className="whitespace-nowrap">{format(parseISO(report.created_at!), 'PPP')}</TableCell>
+                              <TableCell className="font-medium whitespace-nowrap">{report.shop_name}</TableCell>
+                              <TableCell className="whitespace-nowrap">{report.salesman_name}</TableCell>
+                              <TableCell className="text-right whitespace-nowrap">${report.total_sales.toFixed(2)}</TableCell>
+                              <TableCell className="text-right whitespace-nowrap">${report.total_expenses.toFixed(2)}</TableCell>
+                              <TableCell className="text-right font-bold whitespace-nowrap">${(report.total_sales - report.total_expenses).toFixed(2)}</TableCell>
                           </TableRow>
                       ))}
                   </TableBody>

@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function DailyReportPage() {
   return (
-    <div className="max-w-2xl mx-auto space-y-4">
+    <div className="w-full max-w-2xl mx-auto space-y-4">
        <Button variant="outline" asChild>
         <Link href="/employee">
           <ArrowLeft className="mr-2 h-4 w-4" />

@@ -50,7 +50,7 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
         <CardTitle>Pending Stock Requests</CardTitle>
       </CardHeader>
       <CardContent>
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full" defaultValue={Object.keys(requestsByShop)[0]}>
           {Object.entries(requestsByShop).map(([shopName, requests]) => (
             <AccordionItem key={shopName} value={shopName}>
               <AccordionTrigger className="text-lg font-semibold">
@@ -61,6 +61,7 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
                     <Button 
                         onClick={() => handleMerge(shopName, requests)} 
                         disabled={isPending}
+                        className="w-full sm:w-auto"
                     >
                         <Combine className="mr-2 h-4 w-4" />
                         {isPending ? 'Merging...' : 'Merge All & Create Shopping List'}

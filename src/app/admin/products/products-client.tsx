@@ -80,11 +80,11 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <CardTitle>Manage Products</CardTitle>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddNew}>
+            <Button onClick={handleAddNew} className="w-full md:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
@@ -102,25 +102,25 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <div className="border rounded-md">
+        <div className="border rounded-md overflow-x-auto">
             <Table>
             <TableHeader>
                 <TableRow>
                 <TableHead>Product Name</TableHead>
                 <TableHead>Unit</TableHead>
                 <TableHead className="text-right">Price</TableHead>
-                <TableHead className="w-[80px]">Actions</TableHead>
+                <TableHead className="w-[80px] text-center">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {products.map((product) => (
                 <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
-                    <TableCell>{product.unit}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="font-medium whitespace-nowrap">{product.name}</TableCell>
+                    <TableCell className="whitespace-nowrap">{product.unit}</TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
                     ${product.price.toFixed(2)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                     <Button
                         variant="ghost"
                         size="icon"

@@ -10,7 +10,7 @@ export default async function StockRequestPage() {
   const { data: products } = await supabase.from('products').select('id, name, unit').order('name');
   
   return (
-    <div className="max-w-4xl mx-auto space-y-4">
+    <div className="w-full max-w-4xl mx-auto space-y-4">
       <Button variant="outline" asChild>
         <Link href="/employee">
           <ArrowLeft className="mr-2 h-4 w-4" />

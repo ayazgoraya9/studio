@@ -7,7 +7,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Printer, Share2 } from "lucide-react";
 import { ProductCard } from "./product-card";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ProductsClientProps {
   serverProducts: Product[];
@@ -82,22 +81,22 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {products.map((product) => (
         <Card
           key={product.id}
-          className={`transition-all duration-500 ${
+          className={`transition-all duration-500 flex flex-col ${
             highlighted === product.id ? "bg-accent/50 shadow-lg" : ""
           }`}
         >
           <CardHeader>
             <CardTitle>{product.name}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-grow">
             <p className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</p>
             <p className="text-muted-foreground">per {product.unit}</p>
           </CardContent>
-          <CardFooter className="flex gap-2">
+          <CardFooter className="flex flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
               size="sm"
