@@ -21,7 +21,7 @@ export default function HomePage() {
       
       <div className="w-full max-w-4xl mx-auto">
          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Card className="hover:shadow-primary/20 hover:shadow-xl hover:border-primary/50 transition-all duration-300 transform hover:scale-105">
+          <Card className="transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-xl active:scale-100 active:brightness-90">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <Shield className="w-8 h-8 text-primary" />
@@ -40,7 +40,7 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-primary/20 hover:shadow-xl hover:border-primary/50 transition-all duration-300 transform hover:scale-105">
+          <Card className="transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-primary/20 hover:shadow-xl active:scale-100 active:brightness-90">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
                 <User className="w-8 h-8 text-primary" />
