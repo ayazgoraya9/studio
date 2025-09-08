@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { Product } from "@/lib/types";
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const productSchema = z.object({
@@ -27,14 +27,14 @@ interface AddEditProductFormProps {
 }
 
 export function AddEditProductForm({ product, onSuccess }: AddEditProductFormProps) {
-  const [state, formAction] = useFormState(upsertProduct, { error: null });
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -45,22 +45,24 @@ export function AddEditProductForm({ product, onSuccess }: AddEditProductFormPro
     },
   });
 
-  useEffect(() => {
-    if (state.error) {
-      // Handle server-side errors
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: Object.values(state.error).flat().join("\n"),
-      });
-    } else if (state.error === null) {
-      toast({
-        title: "Success",
-        description: `Product ${product ? "updated" : "added"} successfully.`,
-      });
-      onSuccess();
-    }
-  }, [state, product, onSuccess, toast]);
+  const onSubmit = (data: ProductFormValues) => {
+    startTransition(async () => {
+      const result = await upsertProduct(data);
+      if (result?.error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: Object.values(result.error).flat().join("\n"),
+        });
+      } else {
+         toast({
+          title: "Success",
+          description: `Product ${product ? "updated" : "added"} successfully.`,
+        });
+        onSuccess();
+      }
+    })
+  }
 
   useEffect(() => {
     reset({
@@ -72,7 +74,7 @@ export function AddEditProductForm({ product, onSuccess }: AddEditProductFormPro
   }, [product, reset]);
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {product && <input type="hidden" {...register("id")} />}
       
       <div>
@@ -98,13 +100,9 @@ export function AddEditProductForm({ product, onSuccess }: AddEditProductFormPro
           <p className="text-destructive text-sm mt-1">{errors.price.message}</p>
         )}
       </div>
-      
-      {state.error?._form && (
-        <p className="text-destructive text-sm">{state.error._form.join(", ")}</p>
-      )}
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Saving..." : "Save Product"}
+      <Button type="submit" disabled={isPending} className="w-full">
+        {isPending ? "Saving..." : "Save Product"}
       </Button>
     </form>
   );

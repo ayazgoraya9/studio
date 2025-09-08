@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { NewProduct, NewDailyReport, NewStockRequest, NewStockRequestItem } from './types';
+import { NewDailyReport, NewStockRequest, NewStockRequestItem } from './types';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
@@ -13,18 +13,17 @@ const productSchema = z.object({
   price: z.coerce.number().positive('Price must be positive'),
 });
 
-export async function upsertProduct(formData: FormData) {
+export async function upsertProduct(productData: z.infer<typeof productSchema>) {
   const supabase = createClient();
-  const rawData = Object.fromEntries(formData.entries());
   
-  const validation = productSchema.safeParse(rawData);
+  const validation = productSchema.safeParse(productData);
   if (!validation.success) {
     return { error: validation.error.flatten().fieldErrors };
   }
 
-  const { id, ...productData } = validation.data;
+  const { id, ...data } = validation.data;
   
-  const { error } = await supabase.from('products').upsert({ id: id || undefined, ...productData });
+  const { error } = await supabase.from('products').upsert({ id: id || undefined, ...data });
 
   if (error) {
     return { error: { _form: [error.message] } };
@@ -42,11 +41,10 @@ const reportSchema = z.object({
     total_expenses: z.coerce.number().min(0, 'Total expenses cannot be negative'),
 });
 
-export async function submitDailyReport(formData: FormData) {
+export async function submitDailyReport(data: z.infer<typeof reportSchema>) {
     const supabase = createClient();
-    const rawData = Object.fromEntries(formData.entries());
 
-    const validation = reportSchema.safeParse(rawData);
+    const validation = reportSchema.safeParse(data);
     if (!validation.success) {
         return { error: validation.error.flatten().fieldErrors };
     }
@@ -70,12 +68,12 @@ const stockRequestSchema = z.object({
   })).min(1, 'At least one item is required'),
 });
 
-export async function submitStockRequest(data: { shop_name: string; items: { product_id: string; quantity: number }[] }) {
+export async function submitStockRequest(data: z.infer<typeof stockRequestSchema>) {
     const supabase = createClient();
 
     const validation = stockRequestSchema.safeParse(data);
     if (!validation.success) {
-        return { error: 'Invalid data' };
+        return { error: 'Invalid data. Please check your inputs.' };
     }
 
     const { shop_name, items } = validation.data;
@@ -93,6 +91,8 @@ export async function submitStockRequest(data: { shop_name: string; items: { pro
 
     const { error: itemsError } = await supabase.from('stock_request_items').insert(requestItems);
     if (itemsError) {
+        // Attempt to delete the parent request if items fail to insert
+        await supabase.from('stock_requests').delete().eq('id', request.id);
         return { error: itemsError.message };
     }
 

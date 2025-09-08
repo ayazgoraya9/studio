@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useTransition } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -29,7 +29,7 @@ interface StockRequestFormProps {
 
 export function StockRequestForm({ products }: StockRequestFormProps) {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { register, handleSubmit, control, formState: { errors }, reset, watch, setValue } = useForm<StockRequestFormValues>({
     resolver: zodResolver(stockRequestSchema),
     defaultValues: {
@@ -44,23 +44,22 @@ export function StockRequestForm({ products }: StockRequestFormProps) {
   });
 
   const onSubmit = async (data: StockRequestFormValues) => {
-    setIsSubmitting(true);
-    const result = await submitStockRequest(data);
-    setIsSubmitting(false);
-
-    if (result?.error) {
-      toast({
-        variant: 'destructive',
-        title: 'Submission Failed',
-        description: result.error,
-      });
-    } else {
-      toast({
-        title: 'Success',
-        description: 'Your stock request has been submitted.',
-      });
-      reset();
-    }
+    startTransition(async () => {
+        const result = await submitStockRequest(data);
+        if (result?.error) {
+            toast({
+                variant: 'destructive',
+                title: 'Submission Failed',
+                description: result.error,
+            });
+        } else {
+            toast({
+                title: 'Success',
+                description: 'Your stock request has been submitted.',
+            });
+            reset();
+        }
+    });
   };
 
   const selectedProducts = watch('items').map(item => item.product_id);
@@ -118,8 +117,8 @@ export function StockRequestForm({ products }: StockRequestFormProps) {
         <Button type="button" variant="outline" onClick={() => append({ product_id: '', quantity: 1 })}>
             <PlusCircle className="mr-2 h-4 w-4" /> Add Item
         </Button>
-        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit Stock Request'}
+        <Button type="submit" className="w-full sm:w-auto" disabled={isPending}>
+            {isPending ? 'Submitting...' : 'Submit Stock Request'}
         </Button>
       </div>
     </form>
