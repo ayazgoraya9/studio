@@ -14,16 +14,23 @@ export async function middleware(request: NextRequest) {
   // Protected routes for admin
   if (pathname.startsWith('/admin')) {
     if (!user) {
+      // User is not authenticated, redirect to login page.
+      // The original response object is not needed here as we are creating a new redirect response.
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }
 
-  // Redirect logged in users from login page
-  if(pathname === '/login' && user) {
+  // Redirect logged in users from the login page
+  if (pathname === '/login' && user) {
+     // User is authenticated, redirect to the admin dashboard.
+     // The original response object is not needed here as we are creating a new redirect response.
      return NextResponse.redirect(new URL('/admin', request.url))
   }
 
-
+  // If we've made it this far, the user is accessing a page they are allowed to see.
+  // It is critical to return the `response` object from the `createClient` call.
+  // This object has the refreshed session cookies, and returning it ensures they are
+  // passed to the browser for subsequent requests.
   return response
 }
 
