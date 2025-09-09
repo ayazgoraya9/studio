@@ -8,7 +8,6 @@ import {
   FileText,
   Warehouse,
   Home,
-  History,
   LogOut,
   PanelLeft,
 } from 'lucide-react';
@@ -87,10 +86,6 @@ function NavLinks() {
             <Link href="/admin/stock-requests" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
               <Warehouse className="h-4 w-4" />
               Stock Requests
-            </Link>
-            <Link href="/admin/purchasing-history" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
-              <History className="h-4 w-4" />
-              Purchasing History
             </Link>
         </>
     )

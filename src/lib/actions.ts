@@ -162,24 +162,3 @@ export async function updateShoppingListItemStatus(itemId: string, isChecked: bo
     
     return { error: null };
 }
-
-export async function savePurchase(listId: string, totalCost: number) {
-    const supabase = createClient();
-    
-    const { error: listUpdateError } = await supabase.from('shopping_lists').update({ total_cost: totalCost }).eq('id', listId);
-    if(listUpdateError) return { error: listUpdateError.message };
-
-    const purchaseData = { 
-      list_id: listId, 
-      total_cost: totalCost,
-      purchase_date: new Date().toISOString(),
-    };
-
-    const { error: historyError } = await supabase.from('purchasing_history').insert(purchaseData);
-    if(historyError) return { error: historyError.message };
-
-    revalidatePath(`/admin/shopping-list/${listId}`);
-    revalidatePath('/admin/purchasing-history');
-
-    return { error: null };
-}

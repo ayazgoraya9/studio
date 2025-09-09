@@ -8,11 +8,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { savePurchase, updateShoppingListItemStatus } from '@/lib/actions';
+import { updateShoppingListItemStatus } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Share } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface ShoppingListClientProps {
     serverList: FullShoppingList;
@@ -21,7 +19,6 @@ interface ShoppingListClientProps {
 export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
     const [list, setList] = useState(serverList);
     const [isPending, startTransition] = useTransition();
-    const [totalCost, setTotalCost] = useState<number | ''>('');
     const { toast } = useToast();
     const supabase = createClient();
 
@@ -60,24 +57,6 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
         });
     };
     
-    const handleSavePurchase = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (typeof totalCost !== 'number' || totalCost <= 0) {
-            toast({ variant: 'destructive', title: 'Invalid Cost', description: 'Please enter a valid total cost.' });
-            return;
-        }
-
-        startTransition(async () => {
-            const result = await savePurchase(list.id, totalCost);
-            if (result.error) {
-                toast({ variant: 'destructive', title: 'Error', description: result.error });
-            } else {
-                toast({ title: 'Success', description: 'Purchase saved successfully.' });
-                 setList(currentList => ({ ...currentList, total_cost: totalCost }));
-            }
-        });
-    };
-    
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
         toast({ title: 'Link Copied!', description: 'Shopping list link copied to clipboard.' });
@@ -94,11 +73,7 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
                         <CardTitle className="text-2xl">{list.name}</CardTitle>
                         <CardDescription>Check off items as you buy them. Updates are synced in real-time.</CardDescription>
                     </div>
-                    {list.total_cost ? (
-                        <Badge variant="secondary" className="text-lg whitespace-nowrap">Total Cost: ${list.total_cost.toFixed(2)}</Badge>
-                    ) : (
-                        <Button variant="outline" onClick={handleShare}><Share className="mr-2 h-4 w-4"/> Share List</Button>
-                    )}
+                    <Button variant="outline" onClick={handleShare}><Share className="mr-2 h-4 w-4"/> Share List</Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -132,25 +107,6 @@ export function ShoppingListClient({ serverList }: ShoppingListClientProps) {
                     </div>
                 )}
             </CardContent>
-            {!list.total_cost && (
-                <CardFooter>
-                    <form onSubmit={handleSavePurchase} className="w-full flex flex-col md:flex-row items-center md:items-end gap-4 p-4 border rounded-lg bg-secondary/30">
-                        <div className="flex-1 w-full">
-                            <Label htmlFor="total_cost" className="font-semibold">Enter Total Purchase Cost</Label>
-                            <Input 
-                                id="total_cost"
-                                type="number" 
-                                step="0.01"
-                                placeholder="e.g., 123.45"
-                                value={totalCost}
-                                onChange={e => setTotalCost(e.target.value === '' ? '' : parseFloat(e.target.value))}
-                                className="mt-1"
-                            />
-                        </div>
-                        <Button type="submit" disabled={isPending} className="w-full md:w-auto">{isPending ? 'Saving...' : 'Save Purchase'}</Button>
-                    </form>
-                </CardFooter>
-            )}
         </Card>
     );
 }

@@ -27,6 +27,3 @@ export type NewShoppingListItem = Database['public']['Tables']['shopping_list_it
 export type FullShoppingList = ShoppingList & {
   shopping_list_items: ShoppingListItem[];
 };
-
-export type PurchasingHistory = Database['public']['Tables']['purchasing_history']['Row'];
-export type NewPurchasingHistory = Database['public']['Tables']['purchasing_history']['Insert'];
