@@ -1,17 +1,6 @@
 
 // src/app/admin/layout.tsx
 
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarTrigger,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -21,6 +10,7 @@ import {
   Home,
   History,
   LogOut,
+  PanelLeft,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -34,9 +24,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-// The UserProfile now only displays information, it does not contain the form.
 async function UserProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -79,92 +69,91 @@ async function UserProfile() {
     )
 }
 
+function NavLinks() {
+    return (
+        <>
+            <Link href="/admin" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Link>
+            <Link href="/admin/products" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
+              <Package className="h-4 w-4" />
+              Products
+            </Link>
+            <Link href="/admin/reports" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
+              <FileText className="h-4 w-4" />
+              Employee Reports
+            </Link>
+            <Link href="/admin/stock-requests" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
+              <Warehouse className="h-4 w-4" />
+              Stock Requests
+            </Link>
+            <Link href="/admin/purchasing-history" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:text-primary hover:bg-sidebar-accent">
+              <History className="h-4 w-4" />
+              Purchasing History
+            </Link>
+        </>
+    )
+}
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Logo className="w-8 h-8" />
-            <span className="text-lg font-semibold font-headline group-data-[collapsible=icon]:hidden">
-              RetailSync
-            </span>
+    <div className="flex min-h-screen w-full flex-col bg-muted/40">
+      {/* Desktop Sidebar */}
+      <aside className="hidden w-64 flex-col border-r bg-background sm:flex">
+        <div className="flex h-[60px] items-center border-b px-6">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <Logo className="h-6 w-6" />
+            <span>RetailSync</span>
+          </Link>
+        </div>
+        <nav className="flex-1 space-y-1 p-4">
+          <NavLinks />
+        </nav>
+        <div className="mt-auto p-4">
+             <Button variant="outline" asChild>
+                <Link href="/" className="w-full justify-start">
+                  <Home className="mr-2 h-4 w-4" />
+                  Back to Home
+                </Link>
+              </Button>
+        </div>
+      </aside>
+
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-72">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+          {/* Mobile Sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button size="icon" variant="outline" className="sm:hidden">
+                <PanelLeft className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="sm:max-w-xs">
+              <nav className="grid gap-6 text-lg font-medium">
+                <Link href="/" className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base">
+                    <Logo className="h-5 w-5 transition-all group-hover:scale-110" />
+                    <span className="sr-only">RetailSync</span>
+                </Link>
+                <NavLinks />
+              </nav>
+            </SheetContent>
+          </Sheet>
+          
+          <h1 className="text-xl font-semibold flex-1">Admin Dashboard</h1>
+
+          <div className="relative ml-auto flex-1 md:grow-0">
+            {/* Search can go here in the future */}
           </div>
-        </SidebarHeader>
-
-        <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin">
-                  <LayoutDashboard />
-                  Dashboard
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin/products">
-                  <Package />
-                  Products
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin/reports">
-                  <FileText />
-                  Employee Reports
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin/stock-requests">
-                  <Warehouse />
-                  Stock Requests
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href="/admin/purchasing-history">
-                  <History />
-                  Purchasing History
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-
-        <SidebarFooter>
-          <SidebarMenu>
-             <SidebarMenuItem>
-               <SidebarMenuButton asChild variant="outline">
-                <Link href="/">
-                  <Home />
-                   <span className="group-data-[collapsible=icon]:hidden">Back to Home</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-
-      </Sidebar>
-      <div className="flex-1">
-        <header className="p-4 border-b flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-                <SidebarTrigger />
-                <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-            </div>
-            <UserProfile />
+          <UserProfile />
         </header>
-        <main className="p-4">{children}</main>
+        <main className="p-4 sm:p-0 sm:px-6">{children}</main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
