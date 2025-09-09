@@ -79,6 +79,9 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
     setEditingProduct(null);
   }
 
+  const dialogTitle = editingProduct ? "Edit Product" : "Add New Product";
+  const dialogDescription = editingProduct ? "Update the details of the existing product." : "Fill in the details to add a new product.";
+
   return (
     <Card>
       <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -89,14 +92,10 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby={dialogDescription}>
             <DialogHeader>
-              <DialogTitle>
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingProduct ? "Update the details of the existing product." : "Fill in the details to add a new product."}
-              </DialogDescription>
+              <DialogTitle>{dialogTitle}</DialogTitle>
+              <DialogDescription id={dialogDescription}>{dialogDescription}</DialogDescription>
             </DialogHeader>
             <AddEditProductForm
               product={editingProduct}
