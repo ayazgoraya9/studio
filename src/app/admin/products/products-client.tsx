@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -92,10 +93,10 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
-          <DialogContent aria-describedby={dialogDescription}>
+          <DialogContent aria-describedby="dialog-description">
             <DialogHeader>
               <DialogTitle>{dialogTitle}</DialogTitle>
-              <DialogDescription id={dialogDescription}>{dialogDescription}</DialogDescription>
+              <DialogDescription id="dialog-description">{dialogDescription}</DialogDescription>
             </DialogHeader>
             <AddEditProductForm
               product={editingProduct}
