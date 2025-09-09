@@ -1,53 +1,24 @@
+
 "use client";
 
-import { useFormState } from "react-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useTransition } from "react";
 import { upsertProduct } from "@/lib/actions";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import type { Product } from "@/lib/types";
-import { useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-
-const productSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1, "Product name is required"),
-  unit: z.string().optional(),
-  price: z.coerce.number().positive("Price must be a positive number"),
-});
-
-type ProductFormValues = z.infer<typeof productSchema>;
 
 interface AddEditProductFormProps {
   product?: Product | null;
-  onSuccess: () => void;
 }
 
-export function AddEditProductForm({ product, onSuccess }: AddEditProductFormProps) {
+export function AddEditProductForm({ product }: AddEditProductFormProps) {
+  const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      id: product?.id,
-      name: product?.name || "",
-      unit: product?.unit || "",
-      price: product?.price || 0,
-    },
-  });
-
-  const onSubmit = (data: ProductFormValues) => {
+  const handleSubmit = (formData: FormData) => {
     startTransition(async () => {
-      const result = await upsertProduct(data);
+      const result = await upsertProduct(formData);
       if (result?.error) {
         toast({
           variant: "destructive",
@@ -59,51 +30,52 @@ export function AddEditProductForm({ product, onSuccess }: AddEditProductFormPro
           title: "Success",
           description: `Product ${product ? "updated" : "added"} successfully.`,
         });
-        onSuccess();
+        router.push('/admin/products');
       }
     })
   }
 
-  useEffect(() => {
-    reset({
-      id: product?.id,
-      name: product?.name || "",
-      unit: product?.unit || "",
-      price: product?.price || 0,
-    });
-  }, [product, reset]);
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {product && <input type="hidden" {...register("id")} />}
+    <form action={handleSubmit} className="space-y-4 max-w-lg mx-auto">
+      {product?.id && <input type="hidden" name="id" defaultValue={product.id} />}
       
       <div>
-        <Label htmlFor="name">Product Name</Label>
-        <Input id="name" {...register("name")} />
-        {errors.name && (
-          <p className="text-destructive text-sm mt-1">{errors.name.message}</p>
-        )}
+        <label htmlFor="name" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Product Name</label>
+        <input 
+          id="name" 
+          name="name"
+          defaultValue={product?.name || ""}
+          required
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        />
       </div>
 
       <div>
-        <Label htmlFor="unit">Unit (e.g., kg, piece, loaf)</Label>
-        <Input id="unit" {...register("unit")} />
-        {errors.unit && (
-          <p className="text-destructive text-sm mt-1">{errors.unit.message}</p>
-        )}
+        <label htmlFor="unit" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Unit (e.g., kg, piece, loaf)</label>
+        <input 
+          id="unit" 
+          name="unit"
+          defaultValue={product?.unit || ""}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        />
       </div>
 
       <div>
-        <Label htmlFor="price">Price</Label>
-        <Input id="price" type="number" step="0.01" {...register("price")} />
-        {errors.price && (
-          <p className="text-destructive text-sm mt-1">{errors.price.message}</p>
-        )}
+        <label htmlFor="price" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block mb-2">Price</label>
+        <input 
+          id="price" 
+          name="price"
+          type="number" 
+          step="0.01" 
+          defaultValue={product?.price || ""}
+          required
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        />
       </div>
 
-      <Button type="submit" disabled={isPending} className="w-full">
+      <button type="submit" disabled={isPending} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full">
         {isPending ? "Saving..." : "Save Product"}
-      </Button>
+      </button>
     </form>
   );
 }

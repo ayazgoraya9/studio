@@ -1,8 +1,6 @@
+
 import { createClient } from "@/lib/supabase/server";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, parseISO } from 'date-fns';
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -16,50 +14,43 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="space-y-4">
-       <Button variant="outline" asChild>
-        <Link href="/admin">
+        <h1 className="text-3xl font-bold font-headline">Employee Daily Reports</h1>
+        <Link href="/admin" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Dashboard
         </Link>
-      </Button>
-      <Card>
-        <CardHeader>
-          <CardTitle>Employee Daily Reports</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-md overflow-x-auto">
-              <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Shop Name</TableHead>
-                          <TableHead>Salesman</TableHead>
-                          <TableHead className="text-right">Total Sales</TableHead>
-                          <TableHead className="text-right">Total Expenses</TableHead>
-                          <TableHead className="text-right">Net</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {reports.length === 0 && (
-                          <TableRow>
-                              <TableCell colSpan={6} className="text-center">No reports submitted yet.</TableCell>
-                          </TableRow>
-                      )}
-                      {reports.map((report) => (
-                          <TableRow key={report.id}>
-                              <TableCell className="whitespace-nowrap">{format(parseISO(report.created_at!), 'PPP')}</TableCell>
-                              <TableCell className="font-medium whitespace-nowrap">{report.shop_name}</TableCell>
-                              <TableCell className="whitespace-nowrap">{report.salesman_name}</TableCell>
-                              <TableCell className="text-right whitespace-nowrap">${report.total_sales.toFixed(2)}</TableCell>
-                              <TableCell className="text-right whitespace-nowrap">${report.total_expenses.toFixed(2)}</TableCell>
-                              <TableCell className="text-right font-bold whitespace-nowrap">${(report.total_sales - report.total_expenses).toFixed(2)}</TableCell>
-                          </TableRow>
-                      ))}
-                  </TableBody>
-              </Table>
-          </div>
-        </CardContent>
-      </Card>
+
+      <div className="border rounded-lg overflow-x-auto bg-card text-card-foreground">
+        <table className="w-full text-sm">
+            <thead className="[&_tr]:border-b">
+                <tr className="border-b transition-colors hover:bg-muted/50">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Shop Name</th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Salesman</th>
+                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Total Sales</th>
+                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Total Expenses</th>
+                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Net</th>
+                </tr>
+            </thead>
+            <tbody className="[&_tr:last-child]:border-0">
+                {reports.length === 0 && (
+                    <tr>
+                        <td colSpan={6} className="p-4 text-center text-muted-foreground">No reports submitted yet.</td>
+                    </tr>
+                )}
+                {reports.map((report) => (
+                    <tr key={report.id} className="border-b transition-colors hover:bg-muted/50">
+                        <td className="p-4 align-middle whitespace-nowrap">{format(parseISO(report.created_at!), 'PPP')}</td>
+                        <td className="p-4 align-middle font-medium whitespace-nowrap">{report.shop_name}</td>
+                        <td className="p-4 align-middle whitespace-nowrap">{report.salesman_name}</td>
+                        <td className="p-4 align-middle text-right whitespace-nowrap">${report.total_sales.toFixed(2)}</td>
+                        <td className="p-4 align-middle text-right whitespace-nowrap">${report.total_expenses.toFixed(2)}</td>
+                        <td className="p-4 align-middle text-right font-bold whitespace-nowrap">${(report.total_sales - report.total_expenses).toFixed(2)}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+      </div>
     </div>
   );
 }

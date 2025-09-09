@@ -1,7 +1,7 @@
+
 import { createClient } from "@/lib/supabase/server";
 import { StockRequestsClient } from "./stock-requests-client";
 import type { FullStockRequest } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -26,21 +26,21 @@ export default async function StockRequestsPage() {
     const requests = data as FullStockRequest[];
 
     const requestsByShop = requests.reduce((acc, request) => {
-        if (!acc[request.shop_name]) {
-            acc[request.shop_name] = [];
+        const shopName = request.shop_name || 'Unknown Shop';
+        if (!acc[shopName]) {
+            acc[shopName] = [];
         }
-        acc[request.shop_name].push(request);
+        acc[shopName].push(request);
         return acc;
     }, {} as Record<string, FullStockRequest[]>);
 
     return (
         <div className="space-y-4">
-            <Button variant="outline" asChild>
-                <Link href="/admin">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Dashboard
-                </Link>
-            </Button>
+            <h1 className="text-3xl font-bold font-headline">Pending Stock Requests</h1>
+            <Link href="/admin" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Link>
             <StockRequestsClient requestsByShop={requestsByShop} />
         </div>
     );

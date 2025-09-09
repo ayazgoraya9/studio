@@ -1,4 +1,3 @@
-// src/lib/actions.ts
 
 'use server';
 
@@ -15,10 +14,17 @@ const productSchema = z.object({
   price: z.coerce.number().positive('Price must be positive'),
 });
 
-export async function upsertProduct(productData: z.infer<typeof productSchema>) {
+export async function upsertProduct(formData: FormData) {
   const supabase = createClient();
+
+  const rawData = {
+      id: formData.get('id') as string || undefined,
+      name: formData.get('name') as string,
+      unit: formData.get('unit') as string,
+      price: formData.get('price') as string,
+  }
   
-  const validation = productSchema.safeParse(productData);
+  const validation = productSchema.safeParse(rawData);
   if (!validation.success) {
     return { error: validation.error.flatten().fieldErrors };
   }
@@ -143,11 +149,13 @@ export async function mergeStockRequests(shopName: string, requestIds: string[])
 
     const { error: listItemsError } = await supabase.from('shopping_list_items').insert(shoppingListItems);
     if (listItemsError) {
+        await supabase.from('shopping_lists').delete().eq('id', shoppingList.id);
         return { error: 'Could not add items to shopping list.' };
     }
 
     const { error: updateError } = await supabase.from('stock_requests').update({ is_merged: true }).in('id', requestIds);
     if(updateError) {
+        // If this fails, it's not critical, but we should log it. The user will still be redirected.
         console.error('Failed to mark requests as merged:', updateError);
     }
 
@@ -159,8 +167,12 @@ export async function updateShoppingListItemStatus(itemId: string, isChecked: bo
     const supabase = createClient();
     const { error } = await supabase.from('shopping_list_items').update({ is_checked: isChecked }).eq('id', itemId);
 
-    if(error) return { error: error.message };
+    if(error) {
+        console.error("Failed to update item status:", error);
+        return { error: error.message };
+    }
     
+    // We don't need to revalidate here because the client-side optimistic update handles the UI change.
     return { error: null };
 }
 
@@ -170,9 +182,6 @@ export async function savePurchase(listId: string, totalCost: number) {
     const { error: listUpdateError } = await supabase.from('shopping_lists').update({ total_cost: totalCost }).eq('id', listId);
     if(listUpdateError) return { error: listUpdateError.message };
 
-    // ================== THE BUG FIX IS HERE ==================
-    // 1. Explicitly set the purchase_date to the current time to avoid nulls.
-    // 2. Your schema will handle the timezone conversion.
     const purchaseData = { 
       list_id: listId, 
       total_cost: totalCost,
@@ -182,10 +191,27 @@ export async function savePurchase(listId: string, totalCost: number) {
     const { error: historyError } = await supabase.from('purchasing_history').insert(purchaseData);
     if(historyError) return { error: historyError.message };
 
-    // 3. Revalidate BOTH the shopping list and the purchasing history page.
     revalidatePath(`/admin/shopping-list/${listId}`);
-    revalidatePath('/admin/purchasing-history'); // THIS LINE FIXES THE BUG
-    // =======================================================
+    // A page for purchase history doesn't exist yet, but if it did, we would revalidate it here.
+    // revalidatePath('/admin/purchasing-history'); 
 
     return { error: null };
+}
+
+export async function deleteProduct(productId: string) {
+    const supabase = createClient();
+    
+    // We need to delete references first
+    await supabase.from('shopping_list_items').delete().eq('product_id', productId);
+    await supabase.from('stock_request_items').delete().eq('product_id', productId);
+
+    const { error } = await supabase.from('products').delete().eq('id', productId);
+
+    if (error) {
+        return { error: error.message };
+    }
+
+    revalidatePath('/admin/products');
+    revalidatePath('/employee/products');
+    redirect('/admin/products');
 }

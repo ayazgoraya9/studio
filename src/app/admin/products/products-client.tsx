@@ -1,30 +1,12 @@
-// src/app/admin/products/products-client.tsx
 
+// src/app/admin/products/products-client.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Edit, PlusCircle } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { AddEditProductForm } from "./add-edit-product-form";
 import { createClient } from "@/lib/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Edit } from "lucide-react";
+import Link from "next/link";
 
 interface ProductsClientProps {
   serverProducts: Product[];
@@ -32,9 +14,6 @@ interface ProductsClientProps {
 
 export function ProductsClient({ serverProducts }: ProductsClientProps) {
   const [products, setProducts] = useState(serverProducts);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
   const supabase = createClient();
 
   useEffect(() => {
@@ -49,7 +28,7 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
         { event: "*", schema: "public", table: "products" },
         (payload) => {
             if (payload.eventType === 'INSERT') {
-                setProducts(current => [payload.new as Product, ...current]);
+                setProducts(current => [payload.new as Product, ...current].sort((a,b) => a.name.localeCompare(b.name)));
             }
             if (payload.eventType === 'UPDATE') {
                 setProducts(current => current.map(p => p.id === payload.new.id ? payload.new as Product : p));
@@ -66,85 +45,38 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
     };
   }, [supabase]);
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setIsDialogOpen(true);
-  };
-
-  const handleAddNew = () => {
-    setEditingProduct(null);
-    setIsDialogOpen(true);
-  };
-  
-  const onFormSuccess = () => {
-    setIsDialogOpen(false);
-    setEditingProduct(null);
-  }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <CardTitle>Manage Products</CardTitle>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddNew} className="w-full md:w-auto">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingProduct 
-                  ? "Update the details for this product." 
-                  : "Fill in the form below to create a new product."}
-              </DialogDescription>
-            </DialogHeader>
-            <AddEditProductForm
-              product={editingProduct}
-              onSuccess={onFormSuccess}
-            />
-          </DialogContent>
-        </Dialog>
-
-      </CardHeader>
-      <CardContent>
-        <div className="border rounded-md overflow-x-auto">
-            <Table>
-              <TableHeader>
-                  <TableRow>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead>Unit</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="w-[80px] text-center">Actions</TableHead>
-                  </TableRow>
-              </TableHeader>
-              <TableBody>
-                  {products.map((product) => (
-                  <TableRow key={product.id}>
-                      <TableCell className="font-medium whitespace-nowrap">{product.name}</TableCell>
-                      <TableCell className="whitespace-nowrap">{product.unit}</TableCell>
-                      <TableCell className="text-right whitespace-nowrap">
-                      ${product.price.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="text-center">
-                      <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(product)}
-                      >
-                          <Edit className="h-4 w-4" />
-                      </Button>
-                      </TableCell>
-                  </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="border rounded-lg overflow-x-auto bg-card text-card-foreground">
+        <table className="w-full text-sm">
+          <thead className="[&_tr]:border-b">
+              <tr className="border-b transition-colors hover:bg-muted/50">
+              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Product Name</th>
+              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Unit</th>
+              <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Price</th>
+              <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground w-[80px]">Actions</th>
+              </tr>
+          </thead>
+          <tbody className="[&_tr:last-child]:border-0">
+              {products.map((product) => (
+              <tr key={product.id} className="border-b transition-colors hover:bg-muted/50">
+                  <td className="p-4 align-middle font-medium whitespace-nowrap">{product.name}</td>
+                  <td className="p-4 align-middle whitespace-nowrap">{product.unit}</td>
+                  <td className="p-4 align-middle text-right whitespace-nowrap">
+                  ${product.price.toFixed(2)}
+                  </td>
+                  <td className="p-4 align-middle text-center">
+                  <Link
+                      href={`/admin/products/${product.id}`}
+                      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
+                  >
+                      <Edit className="h-4 w-4" />
+                  </Link>
+                  </td>
+              </tr>
+              ))}
+          </tbody>
+        </table>
+    </div>
   );
 }
