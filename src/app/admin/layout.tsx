@@ -62,7 +62,7 @@ async function UserProfile() {
                         <button type="submit" className="w-full text-left flex items-center">
                             <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
-                        </button>
+                        </button>                    
                     </form>
                 </DropdownMenuItem>
             </DropdownMenuContent>
@@ -104,59 +104,74 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen w-full flex-col bg-muted/40">
-      {/* Desktop Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-background sm:flex">
-        <div className="flex h-[60px] items-center border-b px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <Logo className="h-6 w-6" />
-            <span>RetailSync</span>
-          </Link>
-        </div>
-        <nav className="flex-1 space-y-1 p-4">
-          <NavLinks />
-        </nav>
-        <div className="mt-auto p-4">
-             <Button variant="outline" asChild>
-                <Link href="/" className="w-full justify-start">
-                  <Home className="mr-2 h-4 w-4" />
-                  Back to Home
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="hidden border-r bg-muted/40 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-2">
+          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Logo className="h-6 w-6" />
+              <span className="">RetailSync</span>
+            </Link>
+          </div>
+          <div className="flex-1">
+            <nav className="grid items-start px-2 text-sm font-medium lg:px-4 space-y-1">
+              <NavLinks />
+            </nav>
+          </div>
+          <div className="mt-auto p-4">
+            <Button size="sm" variant="outline" asChild>
+                <Link href="/" className='w-full justify-start'>
+                    <Home className="mr-2 h-4 w-4" /> 
+                    Back to Home
                 </Link>
-              </Button>
+            </Button>
+          </div>
         </div>
-      </aside>
-
-      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-72">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          {/* Mobile Sheet */}
+      </div>
+      <div className="flex flex-col">
+        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <Sheet>
             <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="sm:hidden">
+              <Button
+                variant="outline"
+                size="icon"
+                className="shrink-0 md:hidden"
+              >
                 <PanelLeft className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
+                <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="sm:max-w-xs">
-              <nav className="grid gap-6 text-lg font-medium">
-                <Link href="/" className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base">
-                    <Logo className="h-5 w-5 transition-all group-hover:scale-110" />
-                    <span className="sr-only">RetailSync</span>
+            <SheetContent side="left" className="flex flex-col">
+              <nav className="grid gap-2 text-lg font-medium">
+                <Link
+                  href="#"
+                  className="flex items-center gap-2 text-lg font-semibold mb-4"
+                >
+                  <Logo className="h-6 w-6" />
+                  <span className="">RetailSync</span>
                 </Link>
                 <NavLinks />
               </nav>
+              <div className="mt-auto">
+                <Button size="sm" variant="outline" asChild>
+                    <Link href="/" className='w-full justify-start'>
+                        <Home className="mr-2 h-4 w-4" /> 
+                        Back to Home
+                    </Link>
+                </Button>
+              </div>
             </SheetContent>
           </Sheet>
-          
-          <h1 className="text-xl font-semibold flex-1">Admin Dashboard</h1>
-
-          <div className="relative ml-auto flex-1 md:grow-0">
-            {/* Search can go here in the future */}
+          <div className="w-full flex-1">
+            {/* Can add a search bar here in the future */}
           </div>
           <Suspense fallback={<UserProfileSkeleton />}>
             <UserProfile />
           </Suspense>
         </header>
-        <main className="p-4 sm:p-0 sm:px-6">{children}</main>
+        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );
