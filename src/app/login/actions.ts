@@ -20,7 +20,7 @@ export async function login(prevState: string | undefined, formData: FormData) {
     return 'Could not authenticate user. Please check your credentials.'
   }
  
-  revalidatePath('/admin', 'layout')
+  revalidatePath('/', 'layout')
   redirect('/admin')
 }
 

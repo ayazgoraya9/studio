@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import React, { Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 async function UserProfile() {
     const supabase = createClient();
@@ -67,6 +69,11 @@ async function UserProfile() {
         </DropdownMenu>
     )
 }
+
+function UserProfileSkeleton() {
+    return <Skeleton className="h-8 w-8 rounded-full" />;
+}
+
 
 function NavLinks() {
     return (
@@ -145,7 +152,9 @@ export default function AdminLayout({
           <div className="relative ml-auto flex-1 md:grow-0">
             {/* Search can go here in the future */}
           </div>
-          <UserProfile />
+          <Suspense fallback={<UserProfileSkeleton />}>
+            <UserProfile />
+          </Suspense>
         </header>
         <main className="p-4 sm:p-0 sm:px-6">{children}</main>
       </div>

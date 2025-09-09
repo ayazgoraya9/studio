@@ -9,21 +9,24 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight, Package, FileText, Warehouse } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { Suspense } from 'react';
+import DashboardSkeleton from './loading';
 
-export default async function AdminDashboardPage() {
+async function DashboardStats() {
   const supabase = createClient();
-  const { count: productCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
-  const { count: reportCount } = await supabase.from('daily_reports').select('*', { count: 'exact', head: true });
-  const { count: requestCount } = await supabase.from('stock_requests').select('*', { count: 'exact', head: true, filter: 'is_merged,eq,false' });
-
+  // Fetch all counts in parallel
+  const [
+    { count: productCount },
+    { count: reportCount },
+    { count: requestCount }
+  ] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('daily_reports').select('*', { count: 'exact', head: true }),
+    supabase.from('stock_requests').select('*', { count: 'exact', head: true, filter: 'is_merged,eq,false' })
+  ]);
+  
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold font-headline">Welcome, Admin!</h2>
-      <p className="text-muted-foreground">
-        Here's a quick overview of your retail operations.
-      </p>
-
-      <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Products</CardTitle>
@@ -63,6 +66,20 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+  )
+}
+
+export default async function AdminDashboardPage() {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-3xl font-bold font-headline">Welcome, Admin!</h2>
+      <p className="text-muted-foreground">
+        Here's a quick overview of your retail operations.
+      </p>
+      
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardStats />
+      </Suspense>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
