@@ -1,3 +1,4 @@
+// src/lib/actions.ts
 
 'use server';
 
@@ -160,5 +161,31 @@ export async function updateShoppingListItemStatus(itemId: string, isChecked: bo
 
     if(error) return { error: error.message };
     
+    return { error: null };
+}
+
+export async function savePurchase(listId: string, totalCost: number) {
+    const supabase = createClient();
+    
+    const { error: listUpdateError } = await supabase.from('shopping_lists').update({ total_cost: totalCost }).eq('id', listId);
+    if(listUpdateError) return { error: listUpdateError.message };
+
+    // ================== THE BUG FIX IS HERE ==================
+    // 1. Explicitly set the purchase_date to the current time to avoid nulls.
+    // 2. Your schema will handle the timezone conversion.
+    const purchaseData = { 
+      list_id: listId, 
+      total_cost: totalCost,
+      purchase_date: new Date().toISOString(),
+    };
+
+    const { error: historyError } = await supabase.from('purchasing_history').insert(purchaseData);
+    if(historyError) return { error: historyError.message };
+
+    // 3. Revalidate BOTH the shopping list and the purchasing history page.
+    revalidatePath(`/admin/shopping-list/${listId}`);
+    revalidatePath('/admin/purchasing-history'); // THIS LINE FIXES THE BUG
+    // =======================================================
+
     return { error: null };
 }

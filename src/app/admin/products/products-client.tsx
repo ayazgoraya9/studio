@@ -1,3 +1,4 @@
+// src/app/admin/products/products-client.tsx
 
 "use client";
 
@@ -19,7 +20,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Edit, PlusCircle, Trash2 } from "lucide-react";
+import { Edit, PlusCircle } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { AddEditProductForm } from "./add-edit-product-form";
 import { createClient } from "@/lib/supabase/client";
@@ -80,23 +81,27 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
     setEditingProduct(null);
   }
 
-  const dialogTitle = editingProduct ? "Edit Product" : "Add New Product";
-  const dialogDescription = editingProduct ? "Update the details of the existing product." : "Fill in the details to add a new product.";
-
   return (
     <Card>
       <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <CardTitle>Manage Products</CardTitle>
+        
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={handleAddNew} className="w-full md:w-auto">
               <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
-          <DialogContent aria-describedby="dialog-description">
+          <DialogContent>
             <DialogHeader>
-              <DialogTitle>{dialogTitle}</DialogTitle>
-              <DialogDescription id="dialog-description">{dialogDescription}</DialogDescription>
+              <DialogTitle>
+                {editingProduct ? "Edit Product" : "Add New Product"}
+              </DialogTitle>
+              <DialogDescription>
+                {editingProduct 
+                  ? "Update the details for this product." 
+                  : "Fill in the form below to create a new product."}
+              </DialogDescription>
             </DialogHeader>
             <AddEditProductForm
               product={editingProduct}
@@ -104,38 +109,39 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
             />
           </DialogContent>
         </Dialog>
+
       </CardHeader>
       <CardContent>
         <div className="border rounded-md overflow-x-auto">
             <Table>
-            <TableHeader>
-                <TableRow>
-                <TableHead>Product Name</TableHead>
-                <TableHead>Unit</TableHead>
-                <TableHead className="text-right">Price</TableHead>
-                <TableHead className="w-[80px] text-center">Actions</TableHead>
-                </TableRow>
-            </TableHeader>
-            <TableBody>
-                {products.map((product) => (
-                <TableRow key={product.id}>
-                    <TableCell className="font-medium whitespace-nowrap">{product.name}</TableCell>
-                    <TableCell className="whitespace-nowrap">{product.unit}</TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
-                    ${product.price.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(product)}
-                    >
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                    </TableCell>
-                </TableRow>
-                ))}
-            </TableBody>
+              <TableHeader>
+                  <TableRow>
+                  <TableHead>Product Name</TableHead>
+                  <TableHead>Unit</TableHead>
+                  <TableHead className="text-right">Price</TableHead>
+                  <TableHead className="w-[80px] text-center">Actions</TableHead>
+                  </TableRow>
+              </TableHeader>
+              <TableBody>
+                  {products.map((product) => (
+                  <TableRow key={product.id}>
+                      <TableCell className="font-medium whitespace-nowrap">{product.name}</TableCell>
+                      <TableCell className="whitespace-nowrap">{product.unit}</TableCell>
+                      <TableCell className="text-right whitespace-nowrap">
+                      ${product.price.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                      <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(product)}
+                      >
+                          <Edit className="h-4 w-4" />
+                      </Button>
+                      </TableCell>
+                  </TableRow>
+                  ))}
+              </TableBody>
             </Table>
         </div>
       </CardContent>
