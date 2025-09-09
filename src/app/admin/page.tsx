@@ -23,7 +23,7 @@ async function DashboardStats() {
   ] = await Promise.all([
     supabase.from('products').select('*', { count: 'exact', head: true }),
     supabase.from('daily_reports').select('*', { count: 'exact', head: true }),
-    supabase.from('stock_requests').select('*', { count: 'exact', head: true, filter: 'is_merged,eq,false' })
+    supabase.from('stock_requests').select('*', { count: 'exact', head: true, })
   ]);
   
   return (

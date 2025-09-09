@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Edit, PlusCircle, Trash2 } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -93,6 +94,9 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
               <DialogTitle>
                 {editingProduct ? "Edit Product" : "Add New Product"}
               </DialogTitle>
+              <DialogDescription>
+                {editingProduct ? "Update the details of the existing product." : "Fill in the details to add a new product."}
+              </DialogDescription>
             </DialogHeader>
             <AddEditProductForm
               product={editingProduct}

@@ -45,9 +45,9 @@ async function UserProfile() {
                     <Avatar className="h-8 w-8">
                         <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
                     </Avatar>
-                </Button>
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent className="w-56" align="end" title="User menu">
                 <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">Admin</p>
@@ -131,7 +131,7 @@ export default function AdminLayout({
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
           <Sheet>
-            <SheetTrigger asChild>
+             <SheetTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
@@ -139,8 +139,8 @@ export default function AdminLayout({
               >
                 <PanelLeft className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
+              </Button> 
+             </SheetTrigger> 
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
                 <Link
