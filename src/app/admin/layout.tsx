@@ -36,30 +36,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
-// This is a clean, safe SignOutButton that will live in the sidebar footer
-function SignOutButton() {
-  return (
-    <form action={logout} className="w-full">
-       <Button
-        type="submit"
-        variant="ghost"
-        className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-      >
-        <LogOut className="mr-2" />
-        <span className="group-data-[collapsible=icon]:hidden">
-          Sign Out
-        </span>
-      </Button>
-    </form>
-  );
-}
-
 // The UserProfile now only displays information, it does not contain the form.
 async function UserProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     const getInitials = (email: string) => {
+        if (!email) return 'U';
         const parts = email.split('@')[0].split(/[._-]/);
         return parts.map(p => p[0]).join('').toUpperCase().slice(0, 2);
     }
@@ -69,7 +52,7 @@ async function UserProfile() {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                        <AvatarFallback>{user?.email ? getInitials(user.email) : 'U'}</AvatarFallback>
+                        <AvatarFallback>{getInitials(user?.email || '')}</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
