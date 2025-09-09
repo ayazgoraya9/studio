@@ -1,11 +1,13 @@
 
+// src/app/admin/purchasing-history/page.tsx
+
 import { createClient } from "@/lib/supabase/server";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { format, parseISO } from 'date-fns';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default async function AdminPurchasingHistoryPage() {
@@ -56,12 +58,16 @@ export default async function AdminPurchasingHistoryPage() {
                       {history.map((item) => (
                           <TableRow key={item.id}>
                               <TableCell className="whitespace-nowrap font-medium">
-                                {format(parseISO(item.purchase_date!), 'PPP')}
+                                {item.purchase_date ? format(parseISO(item.purchase_date), 'PPP') : 'N/A'}
                               </TableCell>
                               <TableCell className="whitespace-nowrap">
-                                <Link href={`/admin/shopping-list/${item.list_id}`} className="hover:underline text-primary">
+                                {item.list_id ? (
+                                  <Link href={`/admin/shopping-list/${item.list_id}`} className="hover:underline text-primary">
                                     {item.shopping_lists?.name || 'Untitled List'}
-                                </Link>
+                                  </Link>
+                                ) : (
+                                  <span>{item.shopping_lists?.name || 'N/A'}</span>
+                                )}
                               </TableCell>
                               <TableCell className="text-right whitespace-nowrap font-mono">
                                 ${item.total_cost.toFixed(2)}

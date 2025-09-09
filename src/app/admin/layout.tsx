@@ -1,4 +1,6 @@
 
+// src/app/admin/layout.tsx
+
 import {
   SidebarProvider,
   Sidebar,
@@ -8,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import {
@@ -18,7 +21,6 @@ import {
   Home,
   History,
   LogOut,
-  User as UserIcon,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
@@ -32,21 +34,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
+// This is a clean, safe SignOutButton that will live in the sidebar footer
 function SignOutButton() {
   return (
     <form action={logout} className="w-full">
-      <button type="submit" className="w-full">
-        <DropdownMenuItem className="w-full cursor-pointer">
-          <LogOut className="mr-2 h-4 w-4" />
+       <Button
+        type="submit"
+        variant="ghost"
+        className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+      >
+        <LogOut className="mr-2" />
+        <span className="group-data-[collapsible=icon]:hidden">
           Sign Out
-        </DropdownMenuItem>
-      </button>
+        </span>
+      </Button>
     </form>
   );
 }
 
+// The UserProfile now only displays information, it does not contain the form.
 async function UserProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -75,7 +83,14 @@ async function UserProfile() {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <SignOutButton />
+                <DropdownMenuItem asChild>
+                     <form action={logout} className="w-full">
+                        <button type="submit" className="w-full text-left flex items-center">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            <span>Log out</span>
+                        </button>
+                    </form>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -91,12 +106,13 @@ export default function AdminLayout({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Logo className="w-4 h-4" />
-            <span className="text-lg font-semibold font-headline">
+            <Logo className="w-8 h-8" />
+            <span className="text-lg font-semibold font-headline group-data-[collapsible=icon]:hidden">
               RetailSync
             </span>
           </div>
         </SidebarHeader>
+
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -131,7 +147,7 @@ export default function AdminLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
+             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href="/admin/purchasing-history">
                   <History />
@@ -139,16 +155,22 @@ export default function AdminLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild variant="outline" className="mt-4">
+          </SidebarMenu>
+        </SidebarContent>
+
+        <SidebarFooter>
+          <SidebarMenu>
+             <SidebarMenuItem>
+               <SidebarMenuButton asChild variant="outline">
                 <Link href="/">
                   <Home />
-                  Back to Home
+                   <span className="group-data-[collapsible=icon]:hidden">Back to Home</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarContent>
+        </SidebarFooter>
+
       </Sidebar>
       <div className="flex-1">
         <header className="p-4 border-b flex items-center justify-between gap-4">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { savePurchase, updateShoppingListItemStatus } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Clipboard, Share } from 'lucide-react';
+import { Share } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface ShoppingListClientProps {
