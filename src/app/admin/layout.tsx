@@ -30,7 +30,7 @@ async function UserProfile() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    const getInitials = (email: string) => {
+    const getInitials = (email?: string | null) => {
         if (!email) return 'U';
         const parts = email.split('@')[0].split(/[._-]/);
         return parts.map(p => p[0]).join('').toUpperCase().slice(0, 2);
@@ -41,7 +41,7 @@ async function UserProfile() {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                        <AvatarFallback>{getInitials(user?.email || '')}</AvatarFallback>
+                        <AvatarFallback>{getInitials(user?.email)}</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
@@ -50,7 +50,7 @@ async function UserProfile() {
                     <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">Admin</p>
                         <p className="text-xs leading-none text-muted-foreground">
-                            {user?.email}
+                            {user?.email ?? 'Loading...'}
                         </p>
                     </div>
                 </DropdownMenuLabel>
