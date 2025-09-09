@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import {
@@ -17,25 +16,69 @@ import {
   FileText,
   Warehouse,
   Home,
-  LogOut,
   History,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { logout } from '../login/actions';
+import { createClient } from '@/lib/supabase/server';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 function SignOutButton() {
   return (
-    <form action={logout}>
-      <Button
-        variant="ghost"
-        className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-      >
-        <LogOut className="mr-2 h-4 w-4" />
-        Sign Out
-      </Button>
+    <form action={logout} className="w-full">
+      <button type="submit" className="w-full">
+        <DropdownMenuItem className="w-full cursor-pointer">
+          <LogOut className="mr-2 h-4 w-4" />
+          Sign Out
+        </DropdownMenuItem>
+      </button>
     </form>
   );
+}
+
+async function UserProfile() {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const getInitials = (email: string) => {
+        const parts = email.split('@')[0].split(/[._-]/);
+        return parts.map(p => p[0]).join('').toUpperCase().slice(0, 2);
+    }
+
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                        <AvatarFallback>{user?.email ? getInitials(user.email) : 'U'}</AvatarFallback>
+                    </Avatar>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">Admin</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                            {user?.email}
+                        </p>
+                    </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <SignOutButton />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
 }
 
 export default function AdminLayout({
@@ -48,7 +91,7 @@ export default function AdminLayout({
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Logo className="w-8 h-8" />
+            <Logo className="w-4 h-4" />
             <span className="text-lg font-semibold font-headline">
               RetailSync
             </span>
@@ -106,14 +149,14 @@ export default function AdminLayout({
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter>
-          <SignOutButton />
-        </SidebarFooter>
       </Sidebar>
       <div className="flex-1">
-        <header className="p-4 border-b flex items-center gap-4">
-          <SidebarTrigger />
-          <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+        <header className="p-4 border-b flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+                <SidebarTrigger />
+                <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+            </div>
+            <UserProfile />
         </header>
         <main className="p-4">{children}</main>
       </div>
