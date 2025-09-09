@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -91,7 +92,6 @@ export async function submitStockRequest(data: z.infer<typeof stockRequestSchema
 
     const { error: itemsError } = await supabase.from('stock_request_items').insert(requestItems);
     if (itemsError) {
-        // Attempt to delete the parent request if items fail to insert
         await supabase.from('stock_requests').delete().eq('id', request.id);
         return { error: itemsError.message };
     }
@@ -147,7 +147,6 @@ export async function mergeStockRequests(shopName: string, requestIds: string[])
 
     const { error: updateError } = await supabase.from('stock_requests').update({ is_merged: true }).in('id', requestIds);
     if(updateError) {
-        // Log this error but don't block user
         console.error('Failed to mark requests as merged:', updateError);
     }
 
@@ -161,7 +160,6 @@ export async function updateShoppingListItemStatus(itemId: string, isChecked: bo
 
     if(error) return { error: error.message };
     
-    // Path revalidation is handled by client-side subscription
     return { error: null };
 }
 
@@ -171,9 +169,17 @@ export async function savePurchase(listId: string, totalCost: number) {
     const { error: listUpdateError } = await supabase.from('shopping_lists').update({ total_cost: totalCost }).eq('id', listId);
     if(listUpdateError) return { error: listUpdateError.message };
 
-    const { error: historyError } = await supabase.from('purchasing_history').insert({ list_id: listId, total_cost: totalCost });
+    const purchaseData = { 
+      list_id: listId, 
+      total_cost: totalCost,
+      purchase_date: new Date().toISOString(),
+    };
+
+    const { error: historyError } = await supabase.from('purchasing_history').insert(purchaseData);
     if(historyError) return { error: historyError.message };
 
     revalidatePath(`/admin/shopping-list/${listId}`);
+    revalidatePath('/admin/purchasing-history');
+
     return { error: null };
 }
