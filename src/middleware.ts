@@ -12,14 +12,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Protected routes for admin
-  if (pathname.startsWith('/admin')) {
-    if (!user) {
-      // User is not authenticated, redirect to login page.
-      // The original response object is not needed here as we are creating a new redirect response.
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
-
+  
   // Redirect logged in users from the login page
   if (pathname === '/login' && user) {
      // User is authenticated, redirect to the admin dashboard.
