@@ -5,8 +5,8 @@
 import { useState, useEffect } from "react";
 import type { Product } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
-import { Edit } from "lucide-react";
 import Link from "next/link";
+import { deleteProduct } from "@/lib/actions";
 
 interface ProductsClientProps {
   serverProducts: Product[];
@@ -45,19 +45,24 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
     };
   }, [supabase]);
 
+  const handleDelete = async (productId: string, productName: string) => {
+    if(confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
+      await deleteProduct(productId);
+    }
+  }
 
   return (
     <div className="border rounded-lg overflow-x-auto bg-card text-card-foreground">
         <table className="w-full text-sm">
-          <thead className="[&_tr]:border-b">
-              <tr className="border-b transition-colors hover:bg-muted/50">
+          <thead>
+              <tr className="border-b">
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Product Name</th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Unit</th>
               <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Price</th>
-              <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground w-[80px]">Actions</th>
+              <th className="h-12 px-4 text-center align-middle font-medium text-muted-foreground">Actions</th>
               </tr>
           </thead>
-          <tbody className="[&_tr:last-child]:border-0">
+          <tbody>
               {products.map((product) => (
               <tr key={product.id} className="border-b transition-colors hover:bg-muted/50">
                   <td className="p-4 align-middle font-medium whitespace-nowrap">{product.name}</td>
@@ -65,13 +70,19 @@ export function ProductsClient({ serverProducts }: ProductsClientProps) {
                   <td className="p-4 align-middle text-right whitespace-nowrap">
                   ${product.price.toFixed(2)}
                   </td>
-                  <td className="p-4 align-middle text-center">
-                  <Link
-                      href={`/admin/products/${product.id}`}
-                      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10"
-                  >
-                      <Edit className="h-4 w-4" />
-                  </Link>
+                  <td className="p-4 align-middle text-center space-x-2">
+                    <Link
+                        href={`/admin/products/${product.id}`}
+                        className="inline-block px-3 py-1 text-sm rounded-md bg-secondary text-secondary-foreground hover:bg-accent"
+                    >
+                        Edit
+                    </Link>
+                    <button
+                        onClick={() => handleDelete(product.id, product.name)}
+                        className="inline-block px-3 py-1 text-sm rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </button>
                   </td>
               </tr>
               ))}

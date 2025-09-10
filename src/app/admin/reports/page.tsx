@@ -2,7 +2,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { format, parseISO } from 'date-fns';
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default async function AdminReportsPage() {
   const supabase = createClient();
@@ -14,16 +13,17 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="space-y-4">
-        <h1 className="text-3xl font-bold font-headline">Employee Daily Reports</h1>
-        <Link href="/admin" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
+      <div>
+        <h1 className="text-3xl font-bold">Employee Daily Reports</h1>
+        <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
+          &larr; Back to Dashboard
         </Link>
+      </div>
 
       <div className="border rounded-lg overflow-x-auto bg-card text-card-foreground">
         <table className="w-full text-sm">
-            <thead className="[&_tr]:border-b">
-                <tr className="border-b transition-colors hover:bg-muted/50">
+            <thead>
+                <tr className="border-b">
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Shop Name</th>
                     <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Salesman</th>
@@ -32,7 +32,7 @@ export default async function AdminReportsPage() {
                     <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Net</th>
                 </tr>
             </thead>
-            <tbody className="[&_tr:last-child]:border-0">
+            <tbody>
                 {reports.length === 0 && (
                     <tr>
                         <td colSpan={6} className="p-4 text-center text-muted-foreground">No reports submitted yet.</td>

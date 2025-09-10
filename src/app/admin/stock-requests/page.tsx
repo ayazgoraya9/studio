@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { StockRequestsClient } from "./stock-requests-client";
 import type { FullStockRequest } from "@/lib/types";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 
 export default async function StockRequestsPage() {
     const supabase = createClient();
@@ -36,10 +35,9 @@ export default async function StockRequestsPage() {
 
     return (
         <div className="space-y-4">
-            <h1 className="text-3xl font-bold font-headline">Pending Stock Requests</h1>
-            <Link href="/admin" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+            <h1 className="text-3xl font-bold">Pending Stock Requests</h1>
+            <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
+              &larr; Back to Dashboard
             </Link>
             <StockRequestsClient requestsByShop={requestsByShop} />
         </div>

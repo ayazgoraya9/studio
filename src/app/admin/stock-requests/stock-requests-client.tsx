@@ -4,7 +4,6 @@
 import { mergeStockRequests } from "@/lib/actions";
 import type { FullStockRequest } from "@/lib/types";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import { Combine } from "lucide-react";
 import { useTransition } from "react";
 
 interface StockRequestsClientProps {
@@ -24,7 +23,7 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
     if (Object.keys(requestsByShop).length === 0) {
         return (
             <div className="border bg-card text-card-foreground shadow-sm rounded-lg p-6 text-center">
-                <h2 className="text-2xl font-semibold leading-none tracking-tight">Pending Stock Requests</h2>
+                <h2 className="text-2xl font-semibold">Pending Stock Requests</h2>
                 <p className="text-center text-muted-foreground p-8">
                     No pending stock requests.
                 </p>
@@ -33,12 +32,9 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
     }
 
   return (
-    <div className="border bg-card text-card-foreground shadow-sm rounded-lg">
-      <div className="p-6">
-        <h2 className="text-2xl font-semibold leading-none tracking-tight">Requests by Shop</h2>
-      </div>
-      <div className="p-6 pt-0">
-        <div className="w-full space-y-2">
+    <div className="border bg-card text-card-foreground shadow-sm rounded-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4">Requests by Shop</h2>
+        <div className="w-full space-y-4">
           {Object.entries(requestsByShop).map(([shopName, requests]) => (
             <details key={shopName} className="border rounded-md p-4 group" open>
               <summary className="text-lg font-semibold cursor-pointer list-none flex justify-between items-center">
@@ -51,9 +47,8 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
                         <button
                             type="submit"
                             disabled={isPending}
-                            className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"
+                            className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 disabled:opacity-50"
                         >
-                            <Combine className="mr-2 h-4 w-4" />
                             {isPending ? 'Merging...' : 'Merge & Create Shopping List'}
                         </button>
                     </form>
@@ -78,7 +73,6 @@ export function StockRequestsClient({ requestsByShop }: StockRequestsClientProps
             </details>
           ))}
         </div>
-      </CardContent>
     </div>
   );
 }

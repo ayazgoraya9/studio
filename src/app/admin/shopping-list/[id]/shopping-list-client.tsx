@@ -5,8 +5,6 @@ import { useState, useEffect, useTransition, useMemo } from 'react';
 import type { FullShoppingList, ShoppingListItem } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
 import { updateShoppingListItemStatus, savePurchase } from '@/lib/actions';
-import { useToast } from '@/hooks/use-toast';
-import { Share } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface ShoppingListClientProps {
@@ -17,7 +15,6 @@ interface ShoppingListClientProps {
 export function ShoppingListClient({ serverList, productPriceMap }: ShoppingListClientProps) {
     const [list, setList] = useState(serverList);
     const [isSaving, startSaving] = useTransition();
-    const { toast } = useToast();
     const supabase = createClient();
     const router = useRouter();
 
@@ -57,7 +54,7 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
     
     const handleShare = () => {
         navigator.clipboard.writeText(window.location.href);
-        toast({ title: 'Link Copied!', description: 'Shopping list link copied to clipboard.' });
+        alert('Link Copied! Shopping list link copied to clipboard.');
     };
 
     const uncheckedItems = list.shopping_list_items.filter(item => !item.is_checked);
@@ -76,10 +73,9 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
         startSaving(async () => {
             const result = await savePurchase(list.id, totalCost);
             if (result?.error) {
-                toast({ variant: 'destructive', title: 'Error', description: result.error });
+                alert('Error: ' + result.error);
             } else {
-                toast({ title: 'List saved!', description: 'Purchase has been recorded in history.' });
-                // We can redirect or update UI here
+                alert('List saved! Purchase has been recorded.');
                 router.push('/admin/stock-requests');
             }
         });
@@ -90,10 +86,10 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
             <div className="p-6">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                     <div className="flex-1">
-                        <h1 className="text-2xl font-semibold leading-none tracking-tight">{list.name}</h1>
+                        <h1 className="text-2xl font-semibold">{list.name}</h1>
                         <p className="text-sm text-muted-foreground">Check off items as you buy them. Updates are synced in real-time.</p>
                     </div>
-                    <button onClick={handleShare} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"><Share className="mr-2 h-4 w-4"/> Share List</button>
+                    <button onClick={handleShare} className="px-4 py-2 text-sm font-medium border border-input bg-background rounded-md hover:bg-accent">Share List</button>
                 </div>
             </div>
             <div className="p-6 pt-0 space-y-6">
@@ -102,7 +98,7 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
                     <div className="space-y-2">
                     {uncheckedItems.length > 0 ? uncheckedItems.map(item => (
                         <div key={item.id} className="flex items-center space-x-3 p-3 bg-background rounded-md border">
-                            <input type="checkbox" id={item.id} checked={!!item.is_checked} onChange={(e) => handleCheckChange(item.id, e.target.checked)} className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
+                            <input type="checkbox" id={item.id} checked={!!item.is_checked} onChange={(e) => handleCheckChange(item.id, e.target.checked)} className="h-4 w-4 shrink-0 rounded-sm border-primary" />
                             <label htmlFor={item.id} className="text-base flex-1 cursor-pointer">
                                 {item.product_name} - <span className="font-bold">{item.quantity} {item.product_unit}</span>
                             </label>
@@ -117,7 +113,7 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
                         <div className="space-y-2">
                         {checkedItems.map(item => (
                             <div key={item.id} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-md border">
-                                 <input type="checkbox" id={item.id} checked={!!item.is_checked} onChange={(e) => handleCheckChange(item.id, e.target.checked)} className="h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
+                                 <input type="checkbox" id={item.id} checked={!!item.is_checked} onChange={(e) => handleCheckChange(item.id, e.target.checked)} className="h-4 w-4 shrink-0 rounded-sm border-primary" />
                                 <label htmlFor={item.id} className="text-base flex-1 line-through text-muted-foreground cursor-pointer">
                                     {item.product_name} - <span className="font-bold">{item.quantity} {item.product_unit}</span>
                                 </label>
@@ -134,7 +130,7 @@ export function ShoppingListClient({ serverList, productPriceMap }: ShoppingList
                             <p className="text-sm text-muted-foreground">Estimated Total Cost</p>
                             <p className="text-2xl font-bold">${totalCost.toFixed(2)}</p>
                         </div>
-                        <button onClick={handleFinishList} disabled={isSaving} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                        <button onClick={handleFinishList} disabled={isSaving} className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-md hover:bg-primary/90 disabled:opacity-50">
                            {isSaving ? 'Saving...' : 'Save Purchase & Finish'}
                         </button>
                     </div>

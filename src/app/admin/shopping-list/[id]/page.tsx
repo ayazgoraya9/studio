@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { ShoppingListClient } from "./shopping-list-client";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import type { Product } from "@/lib/types";
 
 export default async function ShoppingListPage({ params }: { params: { id: string } }) {
@@ -27,9 +26,8 @@ export default async function ShoppingListPage({ params }: { params: { id: strin
     
     return (
         <div className="space-y-4">
-            <Link href="/admin/stock-requests" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Stock Requests
+            <Link href="/admin/stock-requests" className="text-sm text-muted-foreground hover:text-foreground">
+                &larr; Back to Stock Requests
             </Link>
             <ShoppingListClient serverList={shoppingList} productPriceMap={productPriceMap} />
         </div>

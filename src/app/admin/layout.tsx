@@ -1,15 +1,5 @@
 
 import Link from 'next/link';
-import {
-  LayoutDashboard,
-  Package,
-  FileText,
-  Warehouse,
-  Home,
-  LogOut,
-  PanelLeft,
-  ShoppingCart,
-} from 'lucide-react';
 import { logout } from '../login/actions';
 import { createClient } from '@/lib/supabase/server';
 import React, { Suspense } from 'react';
@@ -25,14 +15,12 @@ async function UserProfile() {
     }
 
     return (
-        <div className="relative">
-            <div className="flex items-center gap-4">
-                 <p className="text-sm text-right text-muted-foreground hidden md:block">
-                    {user?.email ?? 'Loading...'}
-                </p>
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-foreground">
-                    <span>{getInitials(user?.email)}</span>
-                </div>
+        <div className="flex items-center gap-4">
+             <p className="text-sm text-right text-muted-foreground hidden md:block">
+                {user?.email ?? 'Loading...'}
+            </p>
+            <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-foreground">
+                <span>{getInitials(user?.email)}</span>
             </div>
         </div>
     )
@@ -43,22 +31,19 @@ function UserProfileSkeleton() {
 }
 
 function NavLinks() {
+    const commonClasses = "flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground";
     return (
         <>
-            <Link href="/admin" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-              <LayoutDashboard className="h-4 w-4" />
+            <Link href="/admin" className={commonClasses}>
               Dashboard
             </Link>
-            <Link href="/admin/products" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-              <Package className="h-4 w-4" />
+            <Link href="/admin/products" className={commonClasses}>
               Products
             </Link>
-            <Link href="/admin/reports" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-              <FileText className="h-4 w-4" />
+            <Link href="/admin/reports" className={commonClasses}>
               Employee Reports
             </Link>
-            <Link href="/admin/stock-requests" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-              <Warehouse className="h-4 w-4" />
+            <Link href="/admin/stock-requests" className={commonClasses}>
               Stock Requests
             </Link>
         </>
@@ -72,12 +57,11 @@ export default function AdminLayout({
 }) {
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 md:block">
+      <div className="hidden border-r bg-sidebar md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <ShoppingCart className="h-6 w-6 text-primary" />
-              <span className="">RetailSync</span>
+          <div className="flex h-14 items-center border-b border-sidebar-border px-4 lg:h-[60px] lg:px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold text-sidebar-primary-foreground">
+              <span className="">RetailSync Admin</span>
             </Link>
           </div>
           <div className="flex-1">
@@ -88,12 +72,10 @@ export default function AdminLayout({
           <div className="mt-auto p-4 space-y-2">
              <form action={logout}>
                 <button type="submit" className="w-full text-left flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                    <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                 </button>                    
             </form>
-            <Link href="/" className='w-full justify-start flex items-center gap-3 rounded-lg border border-border px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'>
-                <Home className="mr-2 h-4 w-4" /> 
+            <Link href="/" className='w-full justify-start flex items-center gap-3 rounded-lg border border-sidebar-border px-3 py-2 text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'>
                 Back to Home
             </Link>
           </div>
@@ -101,7 +83,6 @@ export default function AdminLayout({
       </div>
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          {/* Mobile menu can be re-added here if needed */}
           <div className="w-full flex-1">
             {/* Can add a search bar here in the future */}
           </div>
